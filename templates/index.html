@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="icon" type="icon/png" href="../static/img/icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dev Deverson</title>
+</head>
+<body>
+    
+    <i class="bi bi-list menu-mobile"></i>
+
+    <aside id='header'>
+        <section class="profile">
+            <img src="../static/img/logo.png" alt="foto do logo"></div>
+            
+
+        
+            
+          
+        </section>
+
+        <nav   id='nav-menu' class="nav-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" 
+                  href="#"><i class="bi bi-house"></i>Inicio</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" 
+                  href="#roda-da-vida"><i class="bi bi-clipboard2-data"></i>Roda da vida</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" 
+                    href="#your-routine"><i class="bi bi-heart-pulse"></i>Your Routine</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" 
+                  href="#"><i class="bi bi-gear"></i>Configurações</a>
+                </li>
+            
+            <section>
+                <h1>Sua rotina, sua vida</h1>
+            </section>    
+
+        </nav>
+
+        </div>
+        
+        
+        
+    </aside>
+
+    <main id="main">
+        <div class="container mt-4">
+            <!-- Welcome Section -->
+            <div class="welcome-section mb-5">
+                <h1 class="display-5 mb-4">Bem-vindo ao Your Routine!</h1>
+                
+                <div class="intro-text mb-4">
+                    <h2 class="h3 mb-3">
+                        <span class="text-success">🌱</span> A Vida Equilibrada Não É Sobre Quantidade, Mas Sobre Presença
+                    </h2>
+                    
+                    <p class="lead text-muted">
+                        Muitas vezes, pensamos que não temos tempo suficiente. Mas a questão real é: <strong>onde estamos colocando nossa atenção?</strong>
+                    </p>
+                    
+                    <p>
+                        A roda da vida nos ajuda a enxergar os desequilíbrios que causam angustia, ansiedade ou sensação de vazio. 
+                        Ao identificar onde estamos "falhando", podemos ajustar a direção.
+                    </p>
+                </div>
+
+                <div class="start-section mb-4">
+                    <h3 class="h4">Vamos começar?</h3>
+                </div>
+            </div>
+
+            <!-- Schedule Section -->
+            <div class="schedule-container">
+                <div class="table-responsive">
+                    <table class="table table-bordered weekly-schedule">
+                        <thead>
+                            <tr>
+                                <th>Segunda</th>
+                                <th>Terça</th>
+                                <th>Quarta</th>
+                                <th>Quinta</th>
+                                <th>Sexta</th>
+                                <th>Sábado</th>
+                                <th>Domingo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="schedule-cell" data-day="Segunda-feira"></td>
+                                <td class="schedule-cell" data-day="Terça-feira"></td>
+                                <td class="schedule-cell" data-day="Quarta-feira"></td>
+                                <td class="schedule-cell" data-day="Quinta-feira"></td>
+                                <td class="schedule-cell" data-day="Sexta-feira"></td>
+                                <td class="schedule-cell" data-day="Sábado"></td>
+                                <td class="schedule-cell" data-day="Domingo"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modal para adicionar eventos -->
+                <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="eventModalLabel">Adicionar Evento</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="eventForm">
+                                    <div class="mb-3">
+                                        <label for="eventTitle" class="form-label">Título do Evento</label>
+                                        <input type="text" class="form-control" id="eventTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventTime" class="form-label">Horário</label>
+                                        <input type="time" class="form-control" id="eventTime" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventDescription" class="form-label">Descrição</label>
+                                        <textarea class="form-control" id="eventDescription" rows="3"></textarea>
+                                    </div>
+                                    <input type="hidden" id="selectedDay">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                <button type="button" class="btn btn-primary" id="saveEvent">Salvar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Life Wheel Section -->
+            <div id="roda-da-vida" class="life-wheel-section mb-5">
+                <h2 class="section-title mb-4">Comparação de Tempo</h2>
+                
+                <div class="table-container">
+                    <table class="table table-hover life-categories-table">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Horas Ideais</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Saúde</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="10" min="0" max="24">
+                                </td>
+                                <td>A saúde deve ser uma prioridade para todos. Inclui exercícios físicos, cuidados com a alimentação, sono adequado e práticas de autocuidado.</td>
+                            </tr>
+                            <tr>
+                                <td>Carreira</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="40" min="0" max="168">
+                                </td>
+                                <td>A carreira é uma área que geralmente demanda bastante tempo, especialmente para quem trabalha de 8h diárias. Aqui, você pode incluir o tempo de trabalho, desenvolvimento profissional e crescimento na área.</td>
+                            </tr>
+                            <tr>
+                                <td>Relacionamentos</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="10" min="0" max="24">
+                                </td>
+                                <td>Ter um tempo para a família, amigos e parceiro(a) é essencial para a saúde emocional e bem-estar. Esse tempo inclui conversas, atividades sociais e qualidade de tempo com quem você ama.</td>
+                            </tr>
+                            <tr>
+                                <td>Desenvolvimento Pessoal</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="5" min="0" max="24">
+                                </td>
+                                <td>O crescimento pessoal, seja por meio de leitura, cursos, terapia ou outras formas de aprendizagem, é importante para o seu bem-estar e evolução.</td>
+                            </tr>
+                            <tr>
+                                <td>Finanças</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="3" min="0" max="24">
+                                </td>
+                                <td>Organizar as finanças pessoais é crucial para manter uma vida equilibrada e sem preocupações. Isso inclui o gerenciamento de orçamentos, investimentos e revisão de contas.</td>
+                            </tr>
+                            <tr>
+                                <td>Espiritualidade</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="3" min="0" max="24">
+                                </td>
+                                <td>A espiritualidade, que pode ser entendida como momentos de meditação, oração ou reflexão, proporciona equilíbrio emocional e conexão com algo maior.</td>
+                            </tr>
+                            <tr>
+                                <td>Lazer</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="21" min="0" max="168">
+                                </td>
+                                <td>O lazer é essencial para recarregar as energias e melhorar a qualidade de vida. Inclui hobbies, viagens, descanso e atividades recreativas.</td>
+                            </tr>
+                            <tr>
+                                <td>Contribuição</td>
+                                <td>
+                                    <input type="number" class="form-control hours-input" value="3" min="0" max="24">
+                                </td>
+                                <td>Contribuir com a comunidade ou com causas que você acredita ajuda a promover um sentido de propósito e gratidão.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Your Routine Section -->
+            <div id="your-routine" class="routine-section mb-5">
+                <div class="text-center mb-4">
+                    <h2>Planeje com intenção.</h2>
+                    <h2>Equilibre o que importa.</h2>
+                    <h2>Evolua um pouco a cada dia.</h2>
+                    <p class="mt-4">Estamos aqui para caminhar com você rumo a uma rotina que faz sentido de verdade.</p>
+                    <p>Porque sua vida merece mais do que pressa — ela merece propósito.</p>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="wheel-container">
+                            <canvas id="lifeWheel"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="comparison-table-container">
+                            <table class="table comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Horas Ideais</th>
+                                        <th>Horas Reais</th>
+                                        <th>Diferença</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10h</td>
+                                        <td>1.0h</td>
+                                        <td class="text-danger">Saúde</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>40h</td>
+                                        <td>31.0h</td>
+                                        <td class="text-danger">Carreira</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>10h</td>
+                                        <td>1.0h</td>
+                                        <td class="text-danger">Relacionamentos</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>5h</td>
+                                        <td>0h</td>
+                                        <td class="text-danger">Desenvolvimento Pessoal</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3h</td>
+                                        <td>1.0h</td>
+                                        <td class="text-danger">Finanças</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3h</td>
+                                        <td>1.0h</td>
+                                        <td class="text-danger">Espiritualidade</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>21h</td>
+                                        <td>3.28333333333333h</td>
+                                        <td class="text-danger">Lazer</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3h</td>
+                                        <td>1.0h</td>
+                                        <td class="text-danger">Contribuição</td>
+                                        <td><span class="status-badge critical">Crítico</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../static/bootstrap/js/bootstrap.bundle.min.js"></script>    
+    <script src="../static/script.js"></script>
+</body>
+</html>
