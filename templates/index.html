@@ -7,52 +7,33 @@
     <link rel="stylesheet" href="../static/style.css">
     <link rel="icon" type="icon/png" href="../static/img/icon.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <title>Dev Deverson</title>
 </head>
 <body>
-    
     <i class="bi bi-list menu-mobile"></i>
 
     <aside id='header'>
         <section class="profile">
-            <img src="../static/img/logo.png" alt="foto do logo"></div>
-            
-
-        
-            
-          
+            <img src="../static/img/logo.png" alt="foto do logo">
         </section>
 
-        <nav   id='nav-menu' class="nav-menu">
+        <nav id='nav-menu' class="nav-menu">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" 
-                  href="#"><i class="bi bi-house"></i>Inicio</a>
+                    <a class="nav-link active" href="#"><i class="bi bi-house"></i>Inicio</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" 
-                  href="#roda-da-vida"><i class="bi bi-clipboard2-data"></i>Roda da vida</a>
+                    <a class="nav-link" href="#roda-da-vida"><i class="bi bi-clipboard2-data"></i>Roda da vida</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" 
-                    href="#your-routine"><i class="bi bi-heart-pulse"></i>Your Routine</a>
-                  </li>
-                <li class="nav-item">
-                  <a class="nav-link" 
-                  href="#"><i class="bi bi-gear"></i>Configurações</a>
+                    <a class="nav-link" href="#your-routine"><i class="bi bi-heart-pulse"></i>Your Routine</a>
                 </li>
-            
+            </ul>
             <section>
                 <h1>Sua rotina, sua vida</h1>
             </section>    
-
         </nav>
-
-        </div>
-        
-        
-        
     </aside>
 
     <main id="main">
@@ -78,6 +59,10 @@
 
                 <div class="start-section mb-4">
                     <h3 class="h4">Vamos começar?</h3>
+                    <p>
+                        Escolha sua categoria: Reflita e pense se sua atividade de rotina se encaixa em: Saúde, Carreira, Relacionamentos,
+                        Desenvolvimento Pessoal, Finanças, Espiritualidade, Lazer, Contribuição.
+                    </p>
                 </div>
             </div>
 
@@ -110,34 +95,42 @@
                     </table>
                 </div>
 
-                <!-- Modal para adicionar eventos -->
+                <!-- Modal para adicionar/editar eventos -->
                 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="eventModalLabel">Adicionar Evento</h5>
+                                <h5 class="modal-title" id="eventModalLabel">Gerenciar Evento</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form id="eventForm">
                                     <div class="mb-3">
-                                        <label for="eventTitle" class="form-label">Título do Evento</label>
-                                        <input type="text" class="form-control" id="eventTitle" required>
+                                        <label for="eventTitle" class="form-label">Categoria do Evento</label>
+                                        <select class="form-select" id="eventTitle" required>
+                                            <option value="">Selecione uma categoria</option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="eventTime" class="form-label">Horário</label>
+                                        <label for="eventTime" class="form-label">Horas gastas nessa atividade</label>
                                         <input type="time" class="form-control" id="eventTime" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="eventDescription" class="form-label">Descrição</label>
-                                        <textarea class="form-control" id="eventDescription" rows="3"></textarea>
+                                        <label for="eventDescription" class="form-label">Atividade</label>
+                                        <textarea class="form-control" id="eventDescription" rows="3" required></textarea>
                                     </div>
                                     <input type="hidden" id="selectedDay">
+                                    <input type="hidden" id="eventId">
+                                    <div class="modal-footer d-flex justify-content-between">
+                                        <button type="button" id="deleteEventBtn" class="btn btn-danger" style="display: none;">
+                                            <i class="bi bi-trash"></i> Remover Evento
+                                        </button>
+                                        <div>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                            <button type="submit" class="btn btn-primary">Salvar</button>
+                                        </div>
+                                    </div>
                                 </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                                <button type="button" class="btn btn-primary" id="saveEvent">Salvar</button>
                             </div>
                         </div>
                     </div>
@@ -146,7 +139,7 @@
 
             <!-- Life Wheel Section -->
             <div id="roda-da-vida" class="life-wheel-section mb-5">
-                <h2 class="section-title mb-4">Comparação de Tempo</h2>
+                <h2 class="section-title mb-4">Reflita sobre seu tempo</h2>
                 
                 <div class="table-container">
                     <table class="table table-hover life-categories-table">
@@ -159,60 +152,60 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Saúde</td>
-                                <td>
+                                <td data-label="Categoria">Saúde</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="10" min="0" max="24">
                                 </td>
-                                <td>A saúde deve ser uma prioridade para todos. Inclui exercícios físicos, cuidados com a alimentação, sono adequado e práticas de autocuidado.</td>
+                                <td data-label="Descrição">A saúde deve ser uma prioridade para todos. Inclui exercícios físicos, cuidados com a alimentação, sono adequado e práticas de autocuidado.</td>
                             </tr>
                             <tr>
-                                <td>Carreira</td>
-                                <td>
+                                <td data-label="Categoria">Carreira</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="40" min="0" max="168">
                                 </td>
-                                <td>A carreira é uma área que geralmente demanda bastante tempo, especialmente para quem trabalha de 8h diárias. Aqui, você pode incluir o tempo de trabalho, desenvolvimento profissional e crescimento na área.</td>
+                                <td data-label="Descrição">A carreira é uma área que geralmente demanda bastante tempo, especialmente para quem trabalha de 8h diárias. Aqui, você pode incluir o tempo de trabalho, desenvolvimento profissional e crescimento na área.</td>
                             </tr>
                             <tr>
-                                <td>Relacionamentos</td>
-                                <td>
+                                <td data-label="Categoria">Relacionamentos</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="10" min="0" max="24">
                                 </td>
-                                <td>Ter um tempo para a família, amigos e parceiro(a) é essencial para a saúde emocional e bem-estar. Esse tempo inclui conversas, atividades sociais e qualidade de tempo com quem você ama.</td>
+                                <td data-label="Descrição">Ter um tempo para a família, amigos e parceiro(a) é essencial para a saúde emocional e bem-estar. Esse tempo inclui conversas, atividades sociais e qualidade de tempo com quem você ama.</td>
                             </tr>
                             <tr>
-                                <td>Desenvolvimento Pessoal</td>
-                                <td>
+                                <td data-label="Categoria">Desenvolvimento Pessoal</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="5" min="0" max="24">
                                 </td>
-                                <td>O crescimento pessoal, seja por meio de leitura, cursos, terapia ou outras formas de aprendizagem, é importante para o seu bem-estar e evolução.</td>
+                                <td data-label="Descrição">O crescimento pessoal, seja por meio de leitura, cursos, terapia ou outras formas de aprendizagem, é importante para o seu bem-estar e evolução.</td>
                             </tr>
                             <tr>
-                                <td>Finanças</td>
-                                <td>
+                                <td data-label="Categoria">Finanças</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="3" min="0" max="24">
                                 </td>
-                                <td>Organizar as finanças pessoais é crucial para manter uma vida equilibrada e sem preocupações. Isso inclui o gerenciamento de orçamentos, investimentos e revisão de contas.</td>
+                                <td data-label="Descrição">Organizar as finanças pessoais é crucial para manter uma vida equilibrada e sem preocupações. Isso inclui o gerenciamento de orçamentos, investimentos e revisão de contas.</td>
                             </tr>
                             <tr>
-                                <td>Espiritualidade</td>
-                                <td>
+                                <td data-label="Categoria">Espiritualidade</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="3" min="0" max="24">
                                 </td>
-                                <td>A espiritualidade, que pode ser entendida como momentos de meditação, oração ou reflexão, proporciona equilíbrio emocional e conexão com algo maior.</td>
+                                <td data-label="Descrição">A espiritualidade, que pode ser entendida como momentos de meditação, oração ou reflexão, proporciona equilíbrio emocional e conexão com algo maior.</td>
                             </tr>
                             <tr>
-                                <td>Lazer</td>
-                                <td>
+                                <td data-label="Categoria">Lazer</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="21" min="0" max="168">
                                 </td>
-                                <td>O lazer é essencial para recarregar as energias e melhorar a qualidade de vida. Inclui hobbies, viagens, descanso e atividades recreativas.</td>
+                                <td data-label="Descrição">O lazer é essencial para recarregar as energias e melhorar a qualidade de vida. Inclui hobbies, viagens, descanso e atividades recreativas.</td>
                             </tr>
                             <tr>
-                                <td>Contribuição</td>
-                                <td>
+                                <td data-label="Categoria">Contribuição</td>
+                                <td data-label="Horas Ideais">
                                     <input type="number" class="form-control hours-input" value="3" min="0" max="24">
                                 </td>
-                                <td>Contribuir com a comunidade ou com causas que você acredita ajuda a promover um sentido de propósito e gratidão.</td>
+                                <td data-label="Descrição">Contribuir com a comunidade ou com causas que você acredita ajuda a promover um sentido de propósito e gratidão.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -231,7 +224,7 @@
                 <div class="row">
                     <div class="col-lg-6 mb-4">
                         <div class="wheel-container">
-                            <canvas id="lifeWheel"></canvas>
+                            <canvas id="lifeWheel" width="400" height="400"></canvas>
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -240,60 +233,12 @@
                                 <thead>
                                     <tr>
                                         <th>Horas Ideais</th>
-                                        <th>Horas Reais</th>
-                                        <th>Diferença</th>
+                                        <th>Categoria</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>10h</td>
-                                        <td>1.0h</td>
-                                        <td class="text-danger">Saúde</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>40h</td>
-                                        <td>31.0h</td>
-                                        <td class="text-danger">Carreira</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>10h</td>
-                                        <td>1.0h</td>
-                                        <td class="text-danger">Relacionamentos</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>5h</td>
-                                        <td>0h</td>
-                                        <td class="text-danger">Desenvolvimento Pessoal</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>3h</td>
-                                        <td>1.0h</td>
-                                        <td class="text-danger">Finanças</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>3h</td>
-                                        <td>1.0h</td>
-                                        <td class="text-danger">Espiritualidade</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>21h</td>
-                                        <td>3.28333333333333h</td>
-                                        <td class="text-danger">Lazer</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>3h</td>
-                                        <td>1.0h</td>
-                                        <td class="text-danger">Contribuição</td>
-                                        <td><span class="status-badge critical">Crítico</span></td>
-                                    </tr>
+                                    <!-- Preenchido dinamicamente pelo JavaScript -->
                                 </tbody>
                             </table>
                         </div>

@@ -1,288 +1,492 @@
+// Definição global das cores das categorias
+window.categoryColors = {
+    'Saúde': '#4A90E2',
+    'Carreira': '#FF6B6B',
+    'Relacionamentos': '#4ECDC4',
+    'Desenvolvimento Pessoal': '#45B7D1',
+    'Finanças': '#96CEB4',
+    'Espiritualidade': '#D4A5A5',
+    'Lazer': '#FFEEAD',
+    'Contribuição': '#9B59B6'
+};
+
+// Variáveis globais para o modal
+let globalModal = null;
+let selectedEventId = null;
+
 /*  CONFIGURAÇÃO DO MENU MOBILE */
 
 // Seleciona o botão do menu mobile e o corpo da página
-const menuMobile = document.querySelector('.menu-mobile')
-const body = document.querySelector('body')
+const menuMobile = document.querySelector('.menu-mobile');
+const body = document.querySelector('body');
+const header = document.querySelector('#header');
+const main = document.querySelector('#main');
 
 // Adiciona um evento de clique ao botão do menu mobile
+
 menuMobile.addEventListener('click',() => {
-    // Verifica se o ícone atual é o de menu (bi-list)
     if (menuMobile.classList.contains("bi-list")) {
-        // Se for, troca para o ícone de X (fechar)
-        menuMobile.classList.replace("bi-list", "bi-x");
+        menuMobile.classList.replace("bi-list", "bi-x"); // Troca para 'bi-x'
     } else {
-        // Se não for, troca para o ícone de menu
-        menuMobile.classList.replace("bi-x", "bi-list");
+        menuMobile.classList.replace("bi-x", "bi-list"); // Caso contrário, troca para 'bi-list'
     };
-    // Alterna a classe que ativa/desativa o menu
     body.classList.toggle("menu-nav-active")
 });
-
-/* * FUNCIONALIDADES DA AGENDA*/
-
-// Quando a página terminar de carregar, executa estas funções
+/* FUNCIONALIDADES DA AGENDA E EVENTOS */
 document.addEventListener('DOMContentLoaded', function() {
-    // Carrega os eventos salvos no armazenamento local
-    loadEvents();
-
-    // Seleciona todas as células da agenda
-    const scheduleCells = document.querySelectorAll('.schedule-cell');
-    // Adiciona um evento de clique em cada célula
-    scheduleCells.forEach(cell => {
-        cell.addEventListener('click', () => openEventModal(cell));
-    });
-
-    // Adiciona um evento de clique ao botão de salvar evento
-    document.getElementById('saveEvent').addEventListener('click', saveEvent);
-});
-
-// Função para abrir o modal de novo evento
-function openEventModal(cell) {
-    // Pega o dia da célula clicada
-    const day = cell.dataset.day;
-    // Define o dia selecionado no formulário
-    document.getElementById('selectedDay').value = day;
-    // Cria e mostra o modal
-    const modal = new bootstrap.Modal(document.getElementById('eventModal'));
-    modal.show();
-}
-
-// Função para salvar um novo evento
-function saveEvent() {
-    // Pega os valores do formulário
-    const title = document.getElementById('eventTitle').value;
-    const time = document.getElementById('eventTime').value;
-    const description = document.getElementById('eventDescription').value;
-    const day = document.getElementById('selectedDay').value;
-
-    // Verifica se os campos obrigatórios foram preenchidos
-    if (!title || !time) {
-        alert('Por favor, preencha o título e horário do evento.');
-        return;
-    }
-
-    // Cria um objeto com os dados do evento
-    const event = {
-        title,          // Título do evento
-        time,           // Horário do evento
-        description,    // Descrição do evento
-        id: Date.now()  // ID único gerado com a data atual
-    };
-
-    // Salva no armazenamento local do navegador
-    let events = JSON.parse(localStorage.getItem('scheduleEvents') || '{}');
-    // Se não existir eventos para este dia, cria um array vazio
-    if (!events[day]) {
-        events[day] = [];
-    }
-    // Adiciona o novo evento ao array
-    events[day].push(event);
-    // Salva no armazenamento local
-    localStorage.setItem('scheduleEvents', JSON.stringify(events));
-
-    // Mostra o evento na tela
-    displayEvent(day, event);
-
-    // Fecha o modal e limpa o formulário
-    const modal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
-    modal.hide();
-    document.getElementById('eventForm').reset();
-}
-
-// Função para carregar os eventos salvos
-function loadEvents() {
-    // Pega os eventos do armazenamento local
-    const events = JSON.parse(localStorage.getItem('scheduleEvents') || '{}');
-    // Para cada dia e seus eventos
-    for (const [day, dayEvents] of Object.entries(events)) {
-        // Mostra cada evento na tela
-        dayEvents.forEach(event => displayEvent(day, event));
-    }
-}
-
-// Função para mostrar um evento na tela
-function displayEvent(day, event) {
-    // Encontra a célula do dia correspondente
-    const cell = document.querySelector(`.schedule-cell[data-day="${day}"]`);
-    // Cria um novo elemento para o evento
-    const eventElement = document.createElement('div');
-    eventElement.className = 'event-item';
-    eventElement.dataset.eventId = event.id;
-    // Define o conteúdo do evento
-    eventElement.innerHTML = `
-        <strong>${event.time}</strong> - ${event.title}
-        <button class="btn btn-sm btn-danger float-end" onclick="deleteEvent('${day}', ${event.id})">×</button>
-    `;
-    // Adiciona o evento à célula
-    cell.appendChild(eventElement);
-}
-
-// Função para deletar um evento
-function deleteEvent(day, eventId) {
-    // Pega os eventos do armazenamento local
-    let events = JSON.parse(localStorage.getItem('scheduleEvents') || '{}');
-    if (events[day]) {
-        // Remove o evento do array
-        events[day] = events[day].filter(event => event.id !== eventId);
-        // Salva no armazenamento local
-        localStorage.setItem('scheduleEvents', JSON.stringify(events));
-    }
-
-    // Remove o evento da tela
-    const eventElement = document.querySelector(`[data-event-id="${eventId}"]`);
-    if (eventElement) {
-        eventElement.remove();
-    }
-}
-
-/* FUNCIONALIDADES DA RODA DA VIDA*/
-
-// Adiciona rolagem suave ao clicar no link da roda da vida
-document.querySelector('a[href="#roda-da-vida"]').addEventListener('click', function(e) {
-    e.preventDefault();
-    // Encontra a seção da roda da vida
-    const rodaDaVida = document.getElementById('roda-da-vida');
-    // Rola suavemente até ela
-    rodaDaVida.scrollIntoView({ behavior: 'smooth' });
+    // Inicializar variáveis
+    let selectedDay = null;
+    const modalElement = document.getElementById('eventModal');
+    globalModal = new bootstrap.Modal(modalElement);
+    const deleteBtn = document.getElementById('deleteEventBtn');
     
-    // Se estiver em modo mobile, fecha o menu
-    if (window.innerWidth <= 1024) {
-        menuMobile.classList.replace("bi-x", "bi-list");
-        body.classList.remove("menu-nav-active");
-    }
-});
-
-// Salva os valores de horas no armazenamento local
-const hoursInputs = document.querySelectorAll('.hours-input');
-hoursInputs.forEach(input => {
-    // Carrega o valor salvo se existir
-    const savedValue = localStorage.getItem(`hours-${input.closest('tr').cells[0].textContent}`);
-    if (savedValue) {
-        input.value = savedValue;
-    }
-
-    // Salva o valor quando for alterado
-    input.addEventListener('change', function() {
-        const category = this.closest('tr').cells[0].textContent;
-        localStorage.setItem(`hours-${category}`, this.value);
-    });
-});
-
-// Configuração do gráfico da Roda da Vida
-document.addEventListener('DOMContentLoaded', function() {
-    //  gráfico será desenhado
-    const ctx = document.getElementById('lifeWheel').getContext('2d');
-    
-    // Define as categorias da roda da vida
-    const categories = [
-        'Saúde',
-        'Carreira',
-        'Relacionamentos',
-        'Desenvolvimento Pessoal',
-        'Finanças',
-        'Espiritualidade',
-        'Lazer',
-        'Contribuição'
-    ];
-    
-    // Define as horas ideais para cada categoria
-    const idealHours = [10, 40, 10, 5, 3, 3, 21, 3];
-    // Define as horas reais para cada categoria
-    const realHours = [1.0, 31.0, 1.0, 0, 1.0, 1.0, 3.28333333333333, 1.0];
-    
-    // Cria o gráfico da roda da vida
-    const lifeWheel = new Chart(ctx, {
-        type: 'polarArea',  // Tipo de gráfico: área polar
-        data: {
-            labels: categories,  // Rótulos das categorias
-            datasets: [{
-                data: realHours,  // Dados das horas reais
-                backgroundColor: [  // Cores para cada categoria
-                    '#4A90E2',  // Saúde - Azul
-                    '#FF6B6B',  // Carreira - Vermelho
-                    '#4ECDC4',  // Relacionamentos - Verde água
-                    '#45B7D1',  // Desenvolvimento Pessoal - Azul claro
-                    '#96CEB4',  // Finanças - Verde claro
-                    '#D4A5A5',  // Espiritualidade - Rosa
-                    '#FFEEAD',  // Lazer - Amarelo
-                    '#9B59B6'   // Contribuição - Roxo
-                ],
-                borderWidth: 1,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,  // O gráfico se ajusta ao tamanho da tela
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    max: Math.max(...idealHours),  // Valor máximo do gráfico
-                    min: 0,  // Valor mínimo do gráfico
-                    ticks: {
-                        stepSize: 5,  // Intervalo entre os valores
-                        display: false
-                    },
-                    grid: {
-                        color: '#e9ecef'  // Cor da grade
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'right',  // Posição da legenda
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true
-                    }
-                }
-            }
-        }
-    });
-
-    // Manipula as mudanças nas horas reais
-    const realHoursInputs = document.querySelectorAll('.real-hours');
-    realHoursInputs.forEach((input, index) => {
-        input.addEventListener('change', function() {
-            // Calcula a diferença entre horas reais e ideais
-            const idealHour = parseFloat(this.closest('tr').cells[0].textContent);
-            const realHour = parseFloat(this.value);
-            const difference = realHour - idealHour;
+    // Carregar categorias no select do modal
+    fetch('/get_categories')
+        .then(response => response.json())
+        .then(categories => {
+            const select = document.getElementById('eventTitle');
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                select.appendChild(option);
+            });
             
-            // Atualiza a célula de diferença
-            const differenceCell = this.closest('tr').cells[2];
-            differenceCell.textContent = difference.toFixed(1) + 'h';
-            // Define a cor baseada na diferença
-            differenceCell.className = 'difference ' + (difference < 0 ? 'text-danger' : 'text-success');
-            
-            // Atualiza o status
-            const statusBadge = this.closest('tr').cells[3].querySelector('.status-badge');
-            if (difference < -5) {
-                statusBadge.textContent = 'Crítico';
-                statusBadge.className = 'status-badge critical';
-            } else if (difference < -2) {
-                statusBadge.textContent = 'Atenção';
-                statusBadge.className = 'status-badge warning';
-            } else {
-                statusBadge.textContent = 'Bom';
-                statusBadge.className = 'status-badge good';
-            }
+            // Inicializar o gráfico após carregar as categorias
+            initializeChart();
+        })
+        .catch(error => {
+            console.error('Erro ao carregar categorias:', error);
+        });
 
-            // Atualiza o gráfico
-            lifeWheel.data.datasets[0].data[index] = realHour;
-            lifeWheel.update();
+    // Carregar eventos salvos
+    loadSavedEvents();
+
+    // Adicionar listeners para células da agenda
+    document.querySelectorAll('.schedule-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            selectedDay = this.getAttribute('data-day');
+            document.getElementById('selectedDay').value = selectedDay;
+            selectedEventId = null;
+            document.getElementById('eventId').value = '';
+            document.getElementById('eventForm').reset();
+            deleteBtn.style.display = 'none';
+            document.getElementById('eventModalLabel').textContent = 'Adicionar Evento';
+            globalModal.show();
         });
     });
 
-    // Adiciona rolagem suave para a seção "Sua Rotina"
-    document.querySelector('a[href="#your-routine"]').addEventListener('click', function(e) {
-        e.preventDefault();
-        const yourRoutine = document.getElementById('your-routine');
-        yourRoutine.scrollIntoView({ behavior: 'smooth' });
-        
-        // Se estiver em modo mobile, fecha o menu
-        if (window.innerWidth <= 1024) {
-            menuMobile.classList.replace("bi-x", "bi-list");
-            body.classList.remove("menu-nav-active");
+    // Listener para o botão de deletar
+    deleteBtn.addEventListener('click', function() {
+        if (selectedEventId) {
+            if (confirm('Tem certeza que deseja remover este evento?')) {
+                const eventElement = document.querySelector(`[data-event-id="${selectedEventId}"]`);
+                if (eventElement) {
+                    const category = eventElement.getAttribute('data-category');
+                    const hours = parseFloat(eventElement.getAttribute('data-hours'));
+                    
+                    removeEvent(selectedEventId, category, hours);
+                    globalModal.hide();
+                }
+            }
         }
+    });
+
+    // Listener para o formulário de evento
+    document.getElementById('eventForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const category = document.getElementById('eventTitle').value;
+        const hours = document.getElementById('eventTime').value;
+        const description = document.getElementById('eventDescription').value;
+
+        // Converter o valor do input time para horas decimais
+        const [h, m] = hours.split(':');
+        const decimalHours = parseFloat(h) + parseFloat(m) / 60;
+
+        // Enviar dados para o backend
+        fetch('/add_event', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                category: category,
+                hours: decimalHours,
+                description: description,
+                date: selectedDay
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na resposta do servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Atualizar a exibição das horas na tabela
+                updateComparisonTable();
+                
+                // Adicionar o evento na célula do calendário
+                addEventToCalendar(selectedDay, category, hours, description, data.event_id, decimalHours);
+                
+                // Fechar o modal e limpar o formulário
+                globalModal.hide();
+                document.getElementById('eventForm').reset();
+                
+                // Remover backdrop e restaurar scroll
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // Atualizar o gráfico
+                updateChart();
+            } else {
+                alert('Erro ao adicionar evento: ' + (data.message || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao adicionar evento: ' + error.message);
+        });
+    });
+
+    // Listener para fechar modal
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('eventForm').reset();
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
+
+    // Inicializar tabela e gráfico
+    initializeComparisonTable();
+});
+
+// Função para inicializar o gráfico
+function initializeChart() {
+    const canvas = document.getElementById('lifeWheel');
+    if (!canvas) {
+        console.error('Canvas element not found');
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get canvas context');
+        return;
+    }
+
+    // Buscar dados atualizados para o gráfico
+    fetch('/get_categories')
+        .then(response => response.json())
+        .then(categories => {
+            if (!categories || categories.length === 0) {
+                console.error('No categories data received');
+                return;
+            }
+
+            const data = {
+                labels: categories.map(cat => cat.name),
+                datasets: [{
+                    data: categories.map(cat => {
+                        const percentage = Math.min(Math.round((cat.total_hours / cat.ideal_hours) * 100), 100);
+                        return percentage || 0;
+                    }),
+                    backgroundColor: [
+                        '#4A90E2',  // Saúde - Azul
+                        '#FF6B6B',  // Carreira - Vermelho
+                        '#4ECDC4',  // Relacionamentos - Verde água
+                        '#45B7D1',  // Desenvolvimento Pessoal - Azul claro
+                        '#96CEB4',  // Finanças - Verde claro
+                        '#D4A5A5',  // Espiritualidade - Rosa
+                        '#FFEEAD',  // Lazer - Amarelo
+                        '#9B59B6'   // Contribuição - Roxo
+                    ],
+                    borderWidth: 1,
+                    borderColor: '#fff'
+                }]
+            };
+
+            // Destruir gráfico existente se houver
+            if (window.lifeWheel instanceof Chart) {
+                window.lifeWheel.destroy();
+            }
+
+            // Criar novo gráfico
+            window.lifeWheel = new Chart(ctx, {
+                type: 'polarArea',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            max: 100,
+                            min: 0,
+                            ticks: {
+                                stepSize: 20,
+                                display: true,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef'
+                            },
+                            angleLines: {
+                                color: '#e9ecef'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => ({
+                                            text: `${label} (${data.datasets[0].data[i]}%)`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(data.datasets[0].data[i]),
+                                            index: i
+                                        }));
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const category = categories[context.dataIndex];
+                                    const realHours = category.total_hours.toFixed(1);
+                                    const idealHours = category.ideal_hours.toFixed(1);
+                                    return [
+                                        `${category.name}: ${context.raw}%`,
+                                        `Horas Reais: ${realHours}h`,
+                                        `Horas Ideais: ${idealHours}h`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao inicializar gráfico:', error);
+        });
+}
+
+// Função para atualizar o gráfico
+function updateChart() {
+    initializeChart();
+}
+
+// Função para carregar eventos salvos
+function loadSavedEvents() {
+    fetch('/get_events')
+        .then(response => response.json())
+        .then(events => {
+            events.forEach(event => {
+                const hours = Math.floor(event.hours);
+                const minutes = Math.round((event.hours % 1) * 60);
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                addEventToCalendar(event.date, event.category, timeString, event.description, event.id, event.hours);
+            });
+        })
+        .catch(error => console.error('Erro ao carregar eventos:', error));
+}
+
+// Função para adicionar evento no calendário
+function addEventToCalendar(day, category, hours, description, eventId, decimalHours) {
+    if (!day) return;
+    
+    const cell = document.querySelector(`[data-day="${day}"]`);
+    if (cell) {
+        const eventDiv = document.createElement('div');
+        eventDiv.className = 'event-item';
+        eventDiv.dataset.eventId = eventId;
+        eventDiv.dataset.category = category;
+        eventDiv.dataset.hours = decimalHours;
+        
+        // Definir cor do background com fallback
+        const backgroundColor = categoryColors[category] || '#gray';
+        eventDiv.style.backgroundColor = backgroundColor;
+        
+        eventDiv.innerHTML = `
+            <div class="event-content">
+                <strong>${category}</strong>
+                <span>${hours}</span>
+                <p>${description}</p>
+            </div>
+        `;
+
+        // Adicionar listener para editar evento
+        eventDiv.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectedEventId = eventId;
+            document.getElementById('eventId').value = eventId;
+            document.getElementById('eventTitle').value = category;
+            document.getElementById('eventTime').value = hours;
+            document.getElementById('eventDescription').value = description;
+            document.getElementById('selectedDay').value = day;
+            document.getElementById('eventModalLabel').textContent = 'Editar Evento';
+            document.getElementById('deleteEventBtn').style.display = 'block';
+            globalModal.show();
+        });
+        
+        cell.appendChild(eventDiv);
+    }
+}
+
+// Função para remover evento
+function removeEvent(eventId, category, hours) {
+    fetch('/delete_event', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            event_id: parseInt(eventId),
+            category: category,
+            hours: parseFloat(hours)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const eventElement = document.querySelector(`[data-event-id="${eventId}"]`);
+            if (eventElement) {
+                eventElement.remove();
+            }
+            updateComparisonTable();
+            updateChart();
+            selectedEventId = null; // Limpar o ID do evento selecionado
+        } else {
+            alert('Erro ao remover evento: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao remover evento');
+    });
+}
+
+// Função para inicializar a tabela de comparação
+function initializeComparisonTable() {
+    fetch('/get_categories')
+        .then(response => response.json())
+        .then(categories => {
+            const tbody = document.querySelector('.comparison-table tbody');
+            tbody.innerHTML = '';
+            
+            categories.forEach(category => {
+                const row = document.createElement('tr');
+                const idealHours = parseFloat(category.ideal_hours).toFixed(1);
+                const realHours = parseFloat(category.total_hours).toFixed(1);
+                const percentage = (category.total_hours / category.ideal_hours) * 100;
+                
+                let status = 'Crítico';
+                let statusColor = '#dc3545';
+                let categoryColor = '#dc3545';
+                
+                if (percentage >= 80) {
+                    status = 'OK';
+                    statusColor = '#28a745';
+                    categoryColor = '#28a745';
+                } else if (percentage >= 50) {
+                    status = 'Atenção';
+                    statusColor = '#ffc107';
+                    categoryColor = '#dc3545';
+                }
+                
+                row.innerHTML = `
+                    <td data-label="Horas Ideais">${idealHours}h</td>
+                    <td data-label="Categoria" style="color: ${categoryColor}">${category.name}</td>
+                    <td data-label="Status"><span class="status-badge" style="background-color: ${statusColor}">${status}</span></td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            updateChart();
+        })
+        .catch(error => console.error('Erro ao carregar categorias:', error));
+}
+
+// Função para atualizar a tabela de comparação
+function updateComparisonTable() {
+    fetch('/get_categories')
+        .then(response => response.json())
+        .then(categories => {
+            document.querySelectorAll('.comparison-table tbody tr').forEach(row => {
+                const categoryName = row.cells[1].textContent.trim();
+                const category = categories.find(c => c.name === categoryName);
+                
+                if (category) {
+                    row.cells[0].textContent = parseFloat(category.ideal_hours).toFixed(1) + 'h';
+                    
+                    const percentage = (category.total_hours / category.ideal_hours) * 100;
+                    const statusBadge = row.querySelector('.status-badge');
+                    const categoryCell = row.cells[1];
+                    
+                    if (percentage >= 80) {
+                        statusBadge.textContent = 'OK';
+                        statusBadge.style.backgroundColor = '#28a745';
+                        categoryCell.style.color = '#28a745'; // Verde para OK
+                    } else if (percentage >= 50) {
+                        statusBadge.textContent = 'Atenção';
+                        statusBadge.style.backgroundColor = '#ffc107';
+                        categoryCell.style.color = '#dc3545'; // Mantém vermelho para Atenção
+                    } else {
+                        statusBadge.textContent = 'Crítico';
+                        statusBadge.style.backgroundColor = '#dc3545';
+                        categoryCell.style.color = '#dc3545'; // Mantém vermelho para Crítico
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Erro ao atualizar tabela:', error));
+}
+
+// Adicionar listener para mudanças nas horas ideais
+document.querySelectorAll('.hours-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const category = this.closest('tr').cells[0].textContent.trim();
+        const idealHours = parseFloat(this.value);
+        
+        fetch('/update_ideal_hours', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                category: category,
+                ideal_hours: idealHours
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateComparisonTable();
+                updateChart();
+            }
+        })
+        .catch(error => console.error('Erro ao atualizar horas ideais:', error));
     });
 });
